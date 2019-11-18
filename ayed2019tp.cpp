@@ -3,14 +3,6 @@
 #include <string.h>
 using namespace std;
 
-struct Empleado
-{
-	char codEmp[9 + 1];
-	char nombYApe[50 + 1];
-	int cantProdVend;
-	float recaudacion;
-};
-
 struct Venta
 {
 	char codEmp[9 + 1];
@@ -18,6 +10,24 @@ struct Venta
 	int fecha;
 	float precioVenta;
 };
+
+struct ListaProducto
+{
+	int codProd;
+	int fecha;
+	struct ListaProducto *sig;
+};
+
+struct Empleado
+{
+	char codEmp[9 + 1];
+	char nombYApe[50 + 1];
+	int cantProdVend;
+	float recaudacion;
+	ListaProducto *productos;
+};
+
+typedef struct ListaProducto *nodoProducto;
 
 void crearEmpleados()
 {
@@ -108,21 +118,81 @@ void ordenarDescendente(Empleado arrEmpleados[], int arrEmpleadosSize)
 	}
 }
 
+nodoProducto crearNodo()
+{
+	nodoProducto aux;
+	aux = (nodoProducto)malloc(sizeof(struct ListaProducto));
+	aux->sig = NULL;
+	return aux;
+}
+
+void agregarOrdenado(nodoProducto &cabeza, nodoProducto nuevoNodo)
+{
+	nodoProducto current;
+	/* Special case for the head end */
+	if (cabeza == NULL || cabeza->fecha <= nuevoNodo->fecha)
+	{
+		nuevoNodo->sig = cabeza;
+		cabeza = nuevoNodo;
+	}
+	else
+	{
+		/* Locate the node before the point of insertion */
+		current = cabeza;
+		while (current->sig != NULL &&
+			   current->sig->fecha < nuevoNodo->fecha)
+		{
+			current = current->sig;
+		}
+		nuevoNodo->sig = current->sig;
+		current->sig = nuevoNodo;
+	}
+}
+
+nodoProducto agregarVenta(nodoProducto &cabeza, Venta v)
+{
+	nodoProducto temp, p, aux;
+	temp = crearNodo();
+	temp->codProd = v.codProd;
+	temp->fecha = v.fecha;
+
+	agregarOrdenado(cabeza, temp);
+
+	return cabeza;
+}
+
+void mostrarProductos(nodoProducto productos)
+{
+	nodoProducto aux = productos;
+	while (aux != NULL)
+	{
+		cout << aux->codProd << "\t\t" << aux->fecha << endl;
+		aux = aux->sig;
+	}
+};
+
+void liberarLista(nodoProducto &cabeza)
+{
+	nodoProducto actual;
+	while ((actual = cabeza) != NULL)
+	{
+		cabeza = cabeza->sig;
+		free(actual);
+	}
+}
+
 void resolucionTp()
 {
 	//TODO completar aquí con la resolución del TP
 	// recordar usar la libreria string.h para el manejo de comparación y copia de valores de cadenas
 	// funciones útiles para usar: strcmp y stcpy
 
-	cout << "Parte A: Reporte de empleados usando vector estatico" << endl
-		 << endl;
-
 	FILE *empleados = fopen("Empleados.dat", "rb+");
 	FILE *ventas = fopen("Ventas.dat", "rb+");
 
 	if (!ventas || !empleados)
 	{
-		cout << "No se pudo abrir uno de los archivos, saliendo.." << endl;
+		cout << "No se pudo abrir alguno de los archivos, saliendo.." << endl;
 		return;
 	}
 
@@ -143,6 +213,7 @@ void resolucionTp()
 			{
 				arrEmpleados[i].cantProdVend++;
 				arrEmpleados[i].recaudacion += v.precioVenta;
+				agregarVenta(arrEmpleados[i].productos, v);
 			}
 		}
 		fread(&v, sizeof(Venta), 1, ventas);
@@ -160,9 +231,15 @@ void resolucionTp()
 			cout << "Codigo Empleado: " << arrEmpleados[i].codEmp << endl
 				 << "Nombre y apellido: " << arrEmpleados[i].nombYApe << endl
 				 << "Total de productos vendidos: " << arrEmpleados[i].cantProdVend << endl
-				 << "Total recaudado: $" << fixed << arrEmpleados[i].recaudacion << endl
-				 << "\n";
+				 << "Total recaudado: $" << fixed << arrEmpleados[i].recaudacion << endl;
+			cout << "Productos Vendidos:" << endl
+				 << "=================================" << endl
+				 << "Codigo Producto\tFecha" << endl;
+			mostrarProductos(arrEmpleados[i].productos);
+			cout << "=================================" << endl
+				 << endl;
 		}
+		liberarLista(arrEmpleados[i].productos);
 	}
 }
 
