@@ -147,7 +147,7 @@ void agregarOrdenado(nodoProducto &cabeza, nodoProducto nuevoNodo)
 	}
 }
 
-nodoProducto agregarVenta(nodoProducto &cabeza, Venta v)
+void agregarVenta(nodoProducto &cabeza, Venta v)
 {
 	nodoProducto temp, p, aux;
 	temp = crearNodo();
@@ -155,8 +155,6 @@ nodoProducto agregarVenta(nodoProducto &cabeza, Venta v)
 	temp->fecha = v.fecha;
 
 	agregarOrdenado(cabeza, temp);
-
-	return cabeza;
 }
 
 void mostrarProductos(nodoProducto productos)
