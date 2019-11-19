@@ -129,7 +129,6 @@ nodoProducto crearNodo()
 void agregarOrdenado(nodoProducto &cabeza, nodoProducto nuevoNodo)
 {
 	nodoProducto current;
-	/* Special case for the head end */
 	if (cabeza == NULL || cabeza->fecha <= nuevoNodo->fecha)
 	{
 		nuevoNodo->sig = cabeza;
@@ -137,7 +136,6 @@ void agregarOrdenado(nodoProducto &cabeza, nodoProducto nuevoNodo)
 	}
 	else
 	{
-		/* Locate the node before the point of insertion */
 		current = cabeza;
 		while (current->sig != NULL &&
 			   current->sig->fecha < nuevoNodo->fecha)
