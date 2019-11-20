@@ -11,11 +11,11 @@ struct Venta
 	float precioVenta;
 };
 
-struct ListaProducto
+struct Producto
 {
 	int codProd;
 	int fecha;
-	struct ListaProducto *sig;
+	struct Producto *sig;
 };
 
 struct Empleado
@@ -24,10 +24,10 @@ struct Empleado
 	char nombYApe[50 + 1];
 	int cantProdVend;
 	float recaudacion;
-	ListaProducto *productos;
+	Producto *productos;
 };
 
-typedef struct ListaProducto *nodoProducto;
+typedef struct Producto *nodoProducto;
 
 void crearEmpleados()
 {
@@ -121,7 +121,7 @@ void ordenarDescendente(Empleado arrEmpleados[], int arrEmpleadosSize)
 nodoProducto crearNodo()
 {
 	nodoProducto aux;
-	aux = (nodoProducto)malloc(sizeof(struct ListaProducto));
+	aux = (nodoProducto)malloc(sizeof(struct Producto));
 	aux->sig = NULL;
 	return aux;
 }
